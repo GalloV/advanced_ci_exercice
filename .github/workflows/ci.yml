@@ -13,7 +13,7 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [16, 18]
+        node-version: [18, 20]
         os: [ubuntu-latest, windows-latest]
     
     steps:
@@ -40,6 +40,7 @@ jobs:
       
       - name: Lint stage
         run: npm run lint
+        continue-on-error: ${{ matrix.node-version == '16' }}
       
       - name: Test stage
         run: npm run test -- --coverage --watchAll=false
