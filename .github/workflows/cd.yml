@@ -107,11 +107,12 @@ jobs:
           echo "Payload: $payload"
 
           # Trigger Render deploy
-          response=$(curl -s -X POST \
-            "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys" \
-            -H "Authorization: Bearer ${RENDER_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "$payload")
+          payload=$(jq -n --argjson clearCache false '{clearCache: $clearCache}')
+            curl -s -X POST \
+              "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys" \
+              -H "Authorization: Bearer ${RENDER_API_KEY}" \
+              -H "Content-Type: application/json" \
+              -d "$payload"
 
           echo "Response: $response"
 
@@ -119,11 +120,11 @@ jobs:
           deploy_id=$(echo "$response" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
 
           if [ -z "$deploy_id" ]; then
-            echo "❌ Failed to trigger deployment"
+            echo "Failed to trigger deployment"
             exit 1
           fi
 
-          echo "✅ Deployment triggered successfully!"
+          echo "Deployment triggered successfully!"
           echo "Deploy ID: $deploy_id"
           echo "Check status at: https://dashboard.render.com"
 
@@ -134,6 +135,6 @@ jobs:
         run: |
           echo "## Deployment Status" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Application deployed to Render successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "Application deployed to Render successfully!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 Check your deployment at: https://dashboard.render.com" >> $GITHUB_STEP_SUMMARY
+          echo "Check your deployment at: https://dashboard.render.com" >> $GITHUB_STEP_SUMMARY
